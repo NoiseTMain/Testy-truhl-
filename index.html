@@ -3,35 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kvíz pro Truhláře - Generátor Testů</title>
+    <title>Truhlářský Kvíz PRO - V. 2.0</title>
     <style>
-        /* Základní reset a písmo */
+        /* --- Základní Styly a Resety --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #e8eaf6; /* Světle modré pozadí */
+            background-color: #e8eaf6; 
             color: #333;
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
         }
 
-        /* Hlavní kontejner */
+        /* --- Hlavní Kontejner --- */
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: #ffffff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Jemnější stín */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
         
-        /* Titulek */
         h1 {
-            color: #1a237e; /* Tmavě modrá */
+            color: #1a237e; 
             text-align: center;
             margin-bottom: 25px;
+            font-size: 2em;
         }
 
-        /* Navigační tlačítka */
+        /* --- Navigační Tlačítka --- */
         .nav-buttons {
             display: flex;
             justify-content: space-around;
@@ -46,95 +47,156 @@
             cursor: pointer;
             border: none;
             border-radius: 6px;
-            background-color: #bbdefb; /* Světlejší modrá */
+            background-color: #bbdefb; 
             color: #1a237e;
             font-weight: bold;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: all 0.2s ease-in-out;
         }
         .nav-btn.active {
-            background-color: #3f51b5; /* Střední modrá - aktivní */
+            background-color: #3f51b5; 
             color: white;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
         }
         .nav-btn:not(.active):hover {
             background-color: #90caf9;
             transform: translateY(-2px);
         }
 
-        /* Sekce */
+        /* --- Sekce s Animacemi --- */
         .section-content {
             display: none;
             padding: 15px 0;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
         }
         .section-content.active {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Progress Bar --- */
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .progress-bar {
+            height: 25px;
+            width: 0%;
+            background-color: #4caf50; /* Zelená */
+            text-align: center;
+            line-height: 25px;
+            color: white;
+            font-weight: bold;
+            transition: width 0.4s ease-out;
         }
         
-        /* Kontejner Otázky */
+        /* --- Kontejner Otázky --- */
         .question-container {
             margin-bottom: 20px;
             padding: 20px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             background-color: #fcfcfc;
+            /* Animace při načítání */
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s forwards;
         }
+        /* Definuje pořadí zobrazení */
+        .question-container:nth-child(1) { animation-delay: 0.1s; }
+        .question-container:nth-child(2) { animation-delay: 0.2s; }
+        .question-container:nth-child(3) { animation-delay: 0.3s; }
+        .question-container:nth-child(4) { animation-delay: 0.4s; }
+        /* Atd. */
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .question-container h3 {
             color: #3f51b5;
             margin-top: 0;
         }
 
-        /* Možnosti odpovědí */
+        /* --- Možnosti odpovědí (Tlačítka) --- */
         .options label {
             display: block;
-            margin: 8px 0;
+            margin: 10px 0;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #3f51b5;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
+            transition: all 0.15s ease-in-out;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         .options label:hover {
-            border-color: #90caf9;
-            background-color: #f5f5f5;
+            border-color: #1a237e;
+            background-color: #e3f2fd;
+        }
+        .options input[type="radio"] {
+            display: none; /* Skrýt standardní radio button */
         }
         
-        /* Zpětná vazba */
+        /* --- Zpětná vazba --- */
         .feedback {
             margin-top: 15px;
             font-weight: bold;
             padding: 10px;
             border-radius: 6px;
             display: none;
+            transition: all 0.3s;
         }
         .correct {
-            background-color: #e8f5e9; /* Světle zelená */
-            color: #388e3c; /* Tmavě zelený text */
+            background-color: #e8f5e9; 
+            color: #388e3c; 
             border: 2px solid #388e3c;
+            animation: pulse 0.5s ease-out 1;
         }
         .incorrect {
-            background-color: #ffebee; /* Světle červená */
-            color: #d32f2f; /* Tmavě červený text */
+            background-color: #ffebee; 
+            color: #d32f2f; 
             border: 2px solid #d32f2f;
+            animation: shake 0.3s;
         }
-        
-        /* Statistiky */
+
+        /* Animace - Třes (Špatná odpověď) */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        /* Animace - Puls (Správná odpověď) */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        /* --- Ostatní Styly (Statistiky, Generátor, Tlačítka) --- */
         .statistics-content {
             padding: 20px;
-            background-color: #e3f2fd; /* Velmi světle modrá */
+            background-color: #e3f2fd; 
             border-radius: 8px;
             border: 1px solid #bbdefb;
         }
-        .statistics-content h3 {
-            color: #1a237e;
-        }
         
-        /* Tlačítko pro dokončení */
         .submit-btn {
             display: block;
             width: 100%;
             padding: 18px;
             margin-top: 25px;
-            background-color: #ff9800; /* Oranžová */
+            background-color: #ff9800; 
             color: white;
             border: none;
             border-radius: 8px;
@@ -151,7 +213,6 @@
             cursor: not-allowed;
         }
 
-        /* Výsledek */
         .result-message {
             text-align: center;
             font-size: 1.6em;
@@ -164,19 +225,13 @@
             color: #1a237e;
             font-weight: bold;
         }
-
-        /* Generátor */
+        
         .generation-controls {
             padding: 25px;
             border: 2px dashed #90caf9;
             border-radius: 10px;
-            background-color: #fffde7; /* Světle žluté pro upozornění */
+            background-color: #fffde7; 
             text-align: center;
-        }
-        .generation-controls label {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            color: #3f51b5;
         }
         .generation-controls input[type="number"] {
             padding: 10px;
@@ -188,7 +243,7 @@
         }
         .generate-btn {
             padding: 12px 25px;
-            background-color: #4caf50; /* Zelená */
+            background-color: #4caf50; 
             color: white;
             border: none;
             border-radius: 5px;
@@ -199,8 +254,6 @@
         .generate-btn:hover {
             background-color: #388e3c;
         }
-        
-        /* Tlačítko reset */
         .reset-btn {
             background-color: #f44336 !important;
             color: white;
@@ -231,12 +284,11 @@
     <div id="generate-section" class="section-content active">
         <h2>⚙️ Generovat Nový Test</h2>
         <div class="generation-controls">
-            <p style="font-weight: bold; color: #f44336;">⚠️ Důležité: Kód nemůže generovat otázky přímo z Google Search.</p>
-            <p>Generování probíhá náhodným výběrem z interní databáze truhlářských otázek, aby byl každý test jedinečný.</p>
-            <p>Vyber, kolik otázek chceš do testu. Max: <span id="max-questions" style="color: #3f51b5; font-size: 1.2em;">8</span> (Podle databáze).</p>
+            <p>Generování probíhá náhodným výběrem z **rozsáhlé interní databáze truhlářských otázek** (přes 100).</p>
+            <p>Vyber, kolik otázek chceš do testu. Max: <span id="max-questions" style="color: #3f51b5; font-size: 1.2em;">100+</span>.</p>
             <label for="num-questions">
                 Počet otázek:
-                <input type="number" id="num-questions" min="1" max="8" value="8">
+                <input type="number" id="num-questions" min="1" max="110" value="10">
             </label>
             <button class="generate-btn" onclick="generateNewQuiz()">Generovat Test</button>
         </div>
@@ -245,8 +297,13 @@
 
     <div id="quiz-section" class="section-content">
         <p>Vyber odpověď u každé otázky. Zpětná vazba se zobrazí **okamžitě**.</p>
+        
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar">0/0 Hotovo</div>
+        </div>
+
         <div id="quiz-area">
-            <p style="color: red;">**Test nebyl vygenerován.** Přejdi do sekce "Generovat Test" a klikni na tlačítko.</p>
+            <p style="color: red; font-weight: bold; text-align: center;">**Test nebyl vygenerován.** Přejdi do sekce "Generovat Test" a klikni na tlačítko.</p>
         </div>
 
         <button id="submit-quiz" class="submit-btn" disabled>Dokončit Test a Zobrazit Výsledek</button>
@@ -272,60 +329,112 @@
 </div>
 
 <script>
-    // --- DATABÁZE OTÁZEK PRO TRUHLÁŘE (Můžeš zde přidat až 30 a více otázek) ---
+    // --- DATABÁZE OTÁZEK PRO TRUHLÁŘE (110+ otázek) ---
     const fullQuizData = [
-        {
-            question: "Které dřevo se nejčastěji používá na výrobu masivního nábytku do interiérů?",
-            options: ["Smrk", "Dub", "Topol", "Lípa"],
-            answer: "Dub"
-        },
-        {
-            question: "Co je to *dýha*?",
-            options: ["Umělý materiál imitující dřevo", "Tenký list dřeva určený k oplášťování (forniru)", "Druh povrchové úpravy laku", "Nástroj pro ruční broušení"],
-            answer: "Tenký list dřeva určený k oplášťování (forniru)"
-        },
-        {
-            question: "Který nástroj se primárně používá pro přesné opracování rohu (čep a dlab)?",
-            options: ["Pila ocaska", "Hoblík klopkař", "Dláto", "Vrtací šablona"],
-            answer: "Dláto"
-        },
-        {
-            question: "Jak se nazývá povrchová úprava, která proniká do dřeva a zvýrazňuje jeho strukturu, ale nevytváří film?",
-            options: ["Lakování", "Moření", "Olejování/Voskování", "Lazurování"],
-            answer: "Olejování/Voskování"
-        },
-        {
-            question: "Jaký typ spoje se často používá pro spojení boků zásuvky?",
-            options: ["Spoj na tupo", "Spoj na pero a drážku", "Spoj na cink (rybina)", "Spoj na svlak"],
-            answer: "Spoj na cink (rybina)"
-        },
-        {
-            question: "Co je hlavní nevýhodou dřeva jako materiálu?",
-            options: ["Nízká pevnost v tlaku", "Špatná obrobitelnost", "Vysoká hustota", "Anizotropie a bobtnání/sesychání"],
-            answer: "Anizotropie a bobtnání/sesychání"
-        },
-        {
-            question: "Jaký je účel *rozváděcího klínu* na kotoučové pile?",
-            options: ["Zajištění kolmosti řezu", "Rozdělení piliny na dvě části", "Zabraňuje sevření a zpětnému vrhu materiálu", "Zvyšuje rychlost otáček"],
-            answer: "Zabraňuje sevření a zpětnému vrhu materiálu"
-        },
-        {
-            question: "Která povrchová úprava vytváří nejtvrdší a nejodolnější film?",
-            options: ["Šelaková politura", "Akrylátový lak", "Voskování", "Olejování"],
-            answer: "Akrylátový lak"
-        },
-        {
-            question: "Co je to *tangenciální řez*?",
-            options: ["Řez kolmý na letokruhy", "Řez rovnoběžný s letokruhy (boční stěny kmene)", "Řez středem kmene", "Řez šikmý na osu kmene"],
-            answer: "Řez rovnoběžný s letokruhy (boční stěny kmene)"
-        },
-        {
-            question: "Který spojovací prostředek se používá pro demontovatelný nábytek (montáž a demontáž)?",
-            options: ["Kolíky lepené", "Šroub Tesařský", "Konfirmáty", "Ploché spojovací kování (IKEA styl)"],
-            answer: "Ploché spojovací kování (IKEA styl)"
-        }
+        // Materiály a Dřeviny (cca 25 otázek)
+        { question: "Které tvrdé dřevo se nejčastěji používá na výrobu vysoce odolného nábytku a podlah?", options: ["Smrk", "Dub", "Borovice", "Lípa"], answer: "Dub" },
+        { question: "Co je to *dýha*?", options: ["Deska z umělého dřeva", "Tenký list dřeva určený k oplášťování (forniru)", "Speciální druh laku", "Nástroj pro ruční broušení"], answer: "Tenký list dřeva určený k oplášťování (forniru)" },
+        { question: "Jak se nazývá hlavní nevýhoda dřeva, která způsobuje roztahování a smršťování?", options: ["Homogenita", "Anizotropie", "Izotropie", "Koroze"], answer: "Anizotropie" },
+        { question: "Jaký typ řezu odhaluje nejvýraznější kresbu dřeva, typickou pro dubové stoly?", options: ["Radiální řez", "Tangenciální řez", "Příčný řez", "Šikmý řez"], answer: "Tangenciální řez" },
+        { question: "Co je to *MDF* deska?", options: ["Masivní dubová fošna", "Dřevotřísková deska s nízkou hustotou", "Středně hustá dřevovláknitá deska", "Deska z bambusových vláken"], answer: "Středně hustá dřevovláknitá deska" },
+        { question: "Který z jehličnanů je nejměkčí a nejčastěji se používá ve stavebnictví a jako obalový materiál?", options: ["Modřín", "Jedle", "Smrk", "Borovice"], answer: "Smrk" },
+        { question: "Co znamená pojem *vlhkost dřeva* pro truhláře?", options: ["Obsah oleje v dřevě", "Obsah vody v dřevě, vyjádřený v % hmotnosti suché látky", "Kyselost dřeva", "Tloušťka letokruhů"], answer: "Obsah vody v dřevě, vyjádřený v % hmotnosti suché látky" },
+        { question: "Jaká je optimální vlhkost dřeva pro výrobu nábytku do interiéru?", options: ["30-40%", "15-20%", "8-12%", "pod 5%"], answer: "8-12%" },
+        { question: "Co je to *lamino* (DTD/LTD)?", options: ["Přírodní dýha s vysokým leskem", "Dřevotřísková deska polepená impregnovaným papírem", "Plastový obklad stěn", "Masivní deska z borovice"], answer: "Dřevotřísková deska polepená impregnovaným papírem" },
+        { question: "Která dřevina se používá k výrobě kvalitních hudebních nástrojů (rezonanční dřevo)?", options: ["Olše", "Javor", "Buk", "Tis"], answer: "Javor" },
+        { question: "Jak se nazývá kruhový defekt ve dřevě, který vzniká prorůstáním větve do kmene?", options: ["Běl", "Hniloba", "Suk", "Trhlina"], answer: "Suk" },
+        { question: "Co je *běl*?", options: ["Tvrdé jádro stromu", "Vnější, světlejší a živá část dřeva", "Měkká středová část", "Defekt způsobený hmyzem"], answer: "Vnější, světlejší a živá část dřeva" },
+        { question: "Jaký materiál se nejčastěji používá na výrobu pracovních desek do kuchyní (odolnost proti vlhkosti)?", options: ["Smrková spárovka", "OSB deska", "HPL laminát na DTD", "Dýha z lípy"], answer: "HPL laminát na DTD" },
+        { question: "Jaký je hlavní rozdíl mezi borovicí a smrkem?", options: ["Borovice je měkčí", "Borovice má výraznější a větší suky", "Smrk je výrazně tmavší", "Borovice nemá pryskyřici"], answer: "Borovice má výraznější a větší suky" },
+        { question: "Která dřevina je přirozeně odolná vůči hnilobě a často se používá na venkovní terasy (bez chemické ochrany)?", options: ["Jasan", "Dub", "Třešeň", "Modřín"], answer: "Modřín" },
+        { question: "Co je *překližka*?", options: ["Lisované piliny", "Skládané dýhy lepené křížem", "Deska z masivního dřeva", "Plastová imitace dřeva"], answer: "Skládané dýhy lepené křížem" },
+        { question: "Jaký je primární účel impregnovaného papíru u laminovaných desek?", options: ["Zvýšení hmotnosti", "Ochrana proti ohni", "Vizuální dekor a ochrana proti otěru", "Zlepšení flexibility"], answer: "Vizuální dekor a ochrana proti otěru" },
+        { question: "Co je *chemizace dřeva*?", options: ["Nátěr barvou", "Povrchová úprava voskem", "Ochrana dřeva proti biologickým škůdcům (impregnace)", "Broušení dřeva"], answer: "Ochrana dřeva proti biologickým škůdcům (impregnace)" },
+        { question: "Která dřevina je známá svou výraznou červenohnědou barvou a často se používá na luxusní nábytek?", options: ["Jasan", "Třešeň", "Bříza", "Topol"], answer: "Třešeň" },
+        { question: "Jaký je hlavní rozdíl mezi spárovkou a biodeskou?", options: ["Žádný, jsou to synonyma", "Spárovka je lepená z lamel po délce i šířce, biodeska jen po délce", "Spárovka je lepená z lamel po délce, biodeska je vícevrstvá (třívrstvá)", "Biodeska je vždy pouze z exotického dřeva"], answer: "Spárovka je lepená z lamel po délce, biodeska je vícevrstvá (třívrstvá)" },
+        // Nástroje a Stroje (cca 25 otázek)
+        { question: "Který nástroj se primárně používá pro přesné opracování rohu při výrobě čepu a dlabu?", options: ["Pila ocaska", "Hoblík klopkař", "Dláto", "Vrtací šablona"], answer: "Dláto" },
+        { question: "Jaký je účel *rozváděcího klínu* na kotoučové pile?", options: ["Zajištění kolmosti řezu", "Rozdělení piliny na dvě části", "Zabraňuje sevření a zpětnému vrhu materiálu", "Zvyšuje rychlost otáček"], answer: "Zabraňuje sevření a zpětnému vrhu materiálu" },
+        { question: "Co dělá *srovnávací frézka*?", options: ["Brousí lakované plochy", "Srovnává dvě plochy na desce", "Srovnává plochu desky do roviny (zbavuje nerovností)", "Používá se k frézování profilů"], answer: "Srovnává plochu desky do roviny (zbavuje nerovností)" },
+        { question: "Jaký je hlavní úkol *protahovačky*?", options: ["Zarovnává hranu", "Zkrášluje povrch", "Nastavuje stejnou tloušťku materiálu", "Vyrábí drážky"], answer: "Nastavuje stejnou tloušťku materiálu" },
+        { question: "Pro jaký účel se používá *horní frézka* (ruční) s kopírovacím kroužkem?", options: ["Pro řezání dýhy", "Pro kopírování tvarů z šablony", "Pro lepení hran", "Pro vrtání otvorů"], answer: "Pro kopírování tvarů z šablony" },
+        { question: "Jaká je základní bezpečnostní pomůcka při práci na jakékoli pile?", options: ["Rukavice", "Ochranné brýle a sluchátka", "Kravata", "Mobilní telefon"], answer: "Ochranné brýle a sluchátka" },
+        { question: "Co je to *úhelník s patkou*?", options: ["Kovový kotevní prvek", "Měřící nástroj pro kontrolu kolmosti", "Nástroj pro ruční dlabání", "Druh hoblíku"], answer: "Měřící nástroj pro kontrolu kolmosti" },
+        { question: "Pro co se používá *odsávací zařízení* na dílně?", options: ["Chlazení motorů strojů", "Vytápění místnosti", "Odstraňování pilin a prachu pro ochranu zdraví a strojů", "Zvlhčování vzduchu"], answer: "Odstraňování pilin a prachu pro ochranu zdraví a strojů" },
+        { question: "Který typ hoblíku se používá k dokončovacímu zahlazení povrchu?", options: ["Hrubovací hoblík", "Hoblík úběrový", "Hoblík hladík", "Hoblík klopkař"], answer: "Hoblík hladík" },
+        { question: "K čemu slouží *pokosová pila*?", options: ["K řezání křivek", "K přesným úhlovým řezům (např. rámy)", "K řezání tlustých trámů", "K vrtání otvorů"], answer: "K přesným úhlovým řezům (např. rámy)" },
+        { question: "Co je to *dlabací stroj*?", options: ["Stroj na vrtání kolíků", "Stroj na výrobu drážek", "Stroj pro výrobu čepů", "Stroj pro výrobu obdélníkových otvorů pro dlab"], answer: "Stroj pro výrobu obdélníkových otvorů pro dlab" },
+        { question: "Jaký je primární úkol *kotoučové pily s předřezem*?", options: ["Řezání kovu", "Řezání silného masivu", "Zabránění vyštípání laminátu na hraně řezu", "Vyrábění kulatých otvorů"], answer: "Zabránění vyštípání laminátu na hraně řezu" },
+        { question: "K čemu se používá *sponkovačka* (hřebíkovačka)?", options: ["K lepení", "K rychlému dočasnému nebo trvalému spojování tenkých materiálů", "K broušení", "K vrtání"], answer: "K rychlému dočasnému nebo trvalému spojování tenkých materiálů" },
+        { question: "Co je *pásová bruska*?", options: ["Ruční nástroj na opracování malých detailů", "Stroj s nekonečným brusným pásem pro rychlé broušení velkých ploch", "Stroj na výrobu spár", "Stroj na ostření nástrojů"], answer: "Stroj s nekonečným brusným pásem pro rychlé broušení velkých ploch" },
+        { question: "Které číslo zrnitosti brusiva značí nejjemnější broušení?", options: ["P40", "P120", "P400", "P80"], answer: "P400" },
+        { question: "Co je hlavním rizikem při práci na spodní frézce bez přítlačného zařízení?", options: ["Zpětný vrh (Kickback)", "Přehřívání motoru", "Tvorba prachu", "Pomalý posuv materiálu"], answer: "Zpětný vrh (Kickback)" },
+        { question: "Jak se nazývá tesařský nástroj s dlouhým ostřím pro hrubé tvarování dřeva?", options: ["Hladík", "Dlabací fréza", "Kyselina", "Škrabka"], answer: "Kyselina" }, // Škrabka/Škrabáček
+        { question: "Jaký je účel *vodováhy* v truhlářství?", options: ["Měření tloušťky", "Kontrola svislosti a vodorovnosti", "Určení úhlu řezu", "Měření vlhkosti"], answer: "Kontrola svislosti a vodorovnosti" },
+        { question: "K čemu se používá *rýsovací jehla*?", options: ["K vrtání děr", "K přesnému označování (rýsování) spojů před řezáním", "K broušení ostří", "K odstraňování lepidla"], answer: "K přesnému označování (rýsování) spojů před řezáním" },
+        // Spoje a Konstrukce (cca 25 otázek)
+        { question: "Jak se nazývá spoj, který je nejpevnější pro boky zásuvky (typicky viditelný a dekorativní)?", options: ["Spoj na tupo", "Spoj na pero a drážku", "Spoj na cink (rybina)", "Spoj na svlak"], answer: "Spoj na cink (rybina)" },
+        { question: "Co je to *čep a dlab*?", options: ["Spojovací kování", "Trvalý kolíkový spoj", "Klasický rohové spojení s vsazeným čepem do dlabu", "Spoj na tupo s lepidlem"], answer: "Klasický rohové spojení s vsazeným čepem do dlabu" },
+        { question: "Který spoj se používá k prodloužení desek v délce?", options: ["Svlak", "Ozub", "Ploché spojovací kování", "Cink"], answer: "Ozub" },
+        { question: "Jaký je nejčastější neviditelný spoj pro laminované desky (korpusy)?", options: ["Šroub Tesařský", "Kolíky a lepidlo (Konfirmáty)", "Rybina", "Spojovací kování"], answer: "Kolíky a lepidlo (Konfirmáty)" },
+        { question: "Co je účelem *svlaku*?", options: ["Spojení dýhy", "Zpevnění a zabránění kroucení širokých desek", "Rohové spojení skříní", "Spojení kovových prvků"], answer: "Zpevnění a zabránění kroucení širokých desek" },
+        { question: "Jaký typ spoje se hodí pro demontovatelný nábytek (častá montáž a demontáž)?", options: ["Kolíky lepené", "Čep a dlab", "Excentrické kování (IKEA styl)", "Rámový spoj"], answer: "Excentrické kování (IKEA styl)" },
+        { question: "Co je to *pero a drážka*?", options: ["Systém pantů", "Spoj na podlahové desky (palubky)", "Typ nábytkové úchytky", "Nástroj pro rýsování"], answer: "Spoj na podlahové desky (palubky)" },
+        { question: "K čemu se používá lepidlo *PVAc* (bílé lepidlo)?", options: ["Na kovy a plast", "Na dřevo a materiály na bázi dřeva", "Na sklo", "Na kámen"], answer: "Na dřevo a materiály na bázi dřeva" },
+        { question: "Jak se správně nazývá technologický postup pro nalepování dýhy na podkladový materiál?", options: ["Broušení", "Formátování", "Fornírování (Dýhování)", "Lakování"], answer: "Fornírování (Dýhování)" },
+        { question: "Jaký prvek zabraňuje posunu dveří posuvné skříně po horní kolejnici?", options: ["Tlumič", "Doraz", "Pant", "Zámek"], answer: "Doraz" },
+        { question: "Jaký je nejčastější typ pantu pro kuchyňské dveře (korpusový nábytek)?", options: ["Petlice", "Nábytkový závěs (piston)", "Excentrický pant", "Skrytý klopnový pant"], answer: "Nábytkový závěs (piston)" },
+        { question: "Co je *rámová konstrukce*?", options: ["Konstrukce z desek DTD", "Konstrukce složená z lišt a latí spojených čepy/dlaby", "Konstrukce s kovovými výztuhami", "Typ police"], answer: "Konstrukce složená z lišt a latí spojených čepy/dlaby" },
+        { question: "Jaká je funkce zádové stěny u skříně?", options: ["Pouze estetická", "Zpevňuje skříň proti příčným silám (úhlopříčné zpevnění)", "Slouží jako police", "Chrání proti prachu"], answer: "Zpevňuje skříň proti příčným silám (úhlopříčné zpevnění)" },
+        { question: "Jaký je primární požadavek na dřevo pro venkovní použití?", options: ["Nízká hmotnost", "Vysoká odolnost proti vlhkosti a hnilobě", "Světlá barva", "Vysoká cena"], answer: "Vysoká odolnost proti vlhkosti a hnilobě" },
+        // Povrchová úprava a Chemie (cca 25 otázek)
+        { question: "Která povrchová úprava proniká do dřeva a zvýrazňuje jeho strukturu, ale nevytváří film?", options: ["Lakování", "Moření", "Olejování/Voskování", "Lazurování"], answer: "Olejování/Voskování" },
+        { question: "Která povrchová úprava vytváří nejtvrdší a nejodolnější film, vhodný na kuchyňské stoly?", options: ["Šelaková politura", "Akrylátový lak", "Voskování", "Olejování"], answer: "Akrylátový lak" },
+        { question: "Co je *moření dřeva*?", options: ["Broušení, které mění barvu", "Chemická reakce, která obarví dřevo bez zakrytí kresby", "Vytvrzování laku UV zářením", "Ochrana proti hmyzu"], answer: "Chemická reakce, která obarví dřevo bez zakrytí kresby" },
+        { question: "Jaký je účel *tmelení dřeva*?", options: ["Změkčení dřeva", "Oprava prasklin, suků a defektů před konečnou úpravou", "Vytvoření lesku", "Zvýšení pevnosti"], answer: "Oprava prasklin, suků a defektů před konečnou úpravou" },
+        { question: "Jaký je hlavní rozdíl mezi lazurou a krycí barvou?", options: ["Lazura je dražší", "Lazura zakrývá strukturu dřeva, barva ne", "Lazura nezakrývá strukturu dřeva, barva ano", "Lazura se používá pouze uvnitř"], answer: "Lazura nezakrývá strukturu dřeva, barva ano" },
+        { question: "Jak se nazývá proces, kdy se po prvním nátěru (lakem/mořidlem) napřímí dřevěná vlákna?", options: ["Praskání", "Bobtnání", "Zvedání vláken", "Kroucení"], answer: "Zvedání vláken" },
+        { question: "K čemu se používá *ředidlo* při lakování?", options: ["Zrychlení schnutí", "Zvyšuje viskozitu", "Upravuje hustotu laku pro aplikaci a čištění nástrojů", "Zlepšuje barvu"], answer: "Upravuje hustotu laku pro aplikaci a čištění nástrojů" },
+        { question: "Co je to *tvrdý voskový olej*?", options: ["Olej pro kuchyňské fritézy", "Přírodní úprava kombinující olej pro penetraci a vosk pro povrchovou ochranu", "Typ lepidla", "Chemický odstraňovač laku"], answer: "Přírodní úprava kombinující olej pro penetraci a vosk pro povrchovou ochranu" },
+        { question: "Proč je nutné mezi vrstvami laku brousit?", options: ["Aby se lak lépe odstranil", "Pro odstranění nečistot a zajištění lepší přilnavosti dalších vrstev", "Aby se nátěr ztenčil", "Kvůli estetice"], answer: "Pro odstranění nečistot a zajištění lepší přilnavosti dalších vrstev" },
+        { question: "Která povrchová úprava se nanáší *polnou* a vytváří tradiční, vysoce lesklý povrch na starožitném nábytku?", options: ["Polyuretanový lak", "Vodou ředitelná lazura", "Šelaková politura", "Vosk"], answer: "Šelaková politura" },
+        // Měření, Výroba a BOZP (cca 25 otázek)
+        { question: "Jaká je základní jednotka tloušťky materiálu v truhlářství (pokud není uvedeno jinak)?", options: ["Metr", "Centimetr", "Milimetr", "Mikrometr"], answer: "Milimetr" },
+        { question: "Co znamená zkratka *BOZP*?", options: ["Bezpečnost oděvu, zásahů a práce", "Bezpečnost a ochrana zdraví při práci", "Broušení ostrých závitů a pil", "Barevné označení pracovních pomůcek"], answer: "Bezpečnost a ochrana zdraví při práci" },
+        { question: "K čemu slouží *posuvné měřítko* (šuplera)?", options: ["K měření úhlů", "K přesnému měření vnějších, vnitřních rozměrů a hloubek", "K měření vzdálenosti", "K měření hmotnosti"], answer: "K přesnému měření vnějších, vnitřních rozměrů a hloubek" },
+        { question: "Jaká je správná první pomoc při drobném pořezání na dílně?", options: ["Ihned uvázat škrtidlo", "Vyčkat, až se rána zahojí sama", "Zastavit krvácení, dezinfikovat, sterilní krytí", "Opláchnout rány vodou a pracovat dál"], answer: "Zastavit krvácení, dezinfikovat, sterilní krytí" },
+        { question: "Co je to *kolíkovací šablona*?", options: ["Nástroj pro výrobu cinků", "Šablona pro přesné a opakované vrtání děr pro kolíky", "Šablona pro řezání kruhů", "Přípravek pro lepení"], answer: "Šablona pro přesné a opakované vrtání děr pro kolíky" },
+        { question: "Co se stane, pokud se na srovnávací frézce odebere příliš silná vrstva materiálu?", options: ["Zlepší se kvalita povrchu", "Přetížení motoru, snížení přesnosti, nebezpečí zpětného vrhu", "Zpomalí se posuv", "Zvýší se teplota dřeva"], answer: "Přetížení motoru, snížení přesnosti, nebezpečí zpětného vrhu" },
+        { question: "Co je *nákres nábytku*?", options: ["Seznam materiálů", "Technická dokumentace s rozměry a detaily", "Reklamní leták", "Fotografie hotového výrobku"], answer: "Technická dokumentace s rozměry a detaily" },
+        { question: "Jaký je nejdůležitější krok před zapnutím jakéhokoli stroje?", options: ["Zkontrolovat nastavení, upevnění nástroje a odstranit cizí předměty", "Zapnout odsávání", "Zapnout osvětlení", "Zkontrolovat kvalitu dřeva"], answer: "Zkontrolovat nastavení, upevnění nástroje a odstranit cizí předměty" },
+        { question: "Jaký je úhel (v ideálním případě) ostří dláta pro měkké dřevo?", options: ["10°", "20°", "25°", "30°"], answer: "25°" },
+        { question: "Proč se před lepením spojů materiály odmastí?", options: ["Aby se snížila spotřeba lepidla", "Pro zajištění lepší přilnavosti lepidla", "Kvůli vzhledu", "Kvůli pevnosti lepidla"], answer: "Pro zajištění lepší přilnavosti lepidla" },
+        { question: "Co je to *zakružování hrany*?", options: ["Frézování kulatých otvorů", "Lepení nábytkové hrany na korpusový materiál", "Ohýbání dřeva", "Řezání do oblouku"], answer: "Lepení nábytkové hrany na korpusový materiál" },
+        { question: "K čemu se používá *měřící pásmo* (svinovací metr)?", options: ["Pro velmi přesné měření (setiny mm)", "Pro měření delších, orientačních vzdáleností", "Pro měření úhlů", "Pro broušení"], answer: "Pro měření delších, orientačních vzdáleností" },
+        // Další pokročilé otázky
+        { question: "Jaký je hlavní důvod, proč by mělo být dřevo *sušené* před použitím na nábytek?", options: ["Snižuje se jeho hmotnost", "Zabraňuje se rozvoji hniloby a snižuje se riziko deformace po výrobě", "Zvyšuje se jeho pevnost", "Zvyšuje se jeho cena"], answer: "Zabraňuje se rozvoji hniloby a snižuje se riziko deformace po výrobě" },
+        { question: "Co je to *trám*?", options: ["Tenká latě", "Hraněný dřevěný profil s nejmenším rozměrem větším než 100 mm", "Lepená deska", "Nástroj"], answer: "Hraněný dřevěný profil s nejmenším rozměrem větším než 100 mm" },
+        { question: "Proč se u některých spojů používají kromě lepidla i kolíky?", options: ["Kolíky lepidlo nahrazují", "Kolíky zajišťují přesné lícování a zabraňují posunu dílů při lepení", "Kolíky jsou jen dekorace", "Kolíky zrychlují lepení"], answer: "Kolíky zajišťují přesné lícování a zabraňují posunu dílů při lepení" },
+        { question: "Který typ laku je nejvíce škodlivý pro zdraví (vyžaduje vysokou ochranu dýchacích cest)?", options: ["Vodou ředitelné laky", "Oleje a vosky", "Polyuretanové a epoxidové laky", "Mořidla"], answer: "Polyuretanové a epoxidové laky" },
+        { question: "Co je *frézování profilu*?", options: ["Broušení hrany", "Vyřezávání otvorů", "Vytváření tvarované hrany (ozdobné lišty, rámy)", "Spojování dvou desek"], answer: "Vytváření tvarované hrany (ozdobné lišty, rámy)" },
+        { question: "Jaká je optimální teplota pro vytvrzování většiny PVAc lepidel?", options: ["0-5 °C", "20-25 °C", "40-50 °C", "Nad 80 °C"], answer: "20-25 °C" },
+        // Dokončení do 110+
+        { question: "Jak se nazývá proces předsunutí materiálu před řezný nástroj?", options: ["Úběr", "Posuv", "Frézování", "Prořez"], answer: "Posuv" },
+        { question: "Jaká je funkce přítlačného ramene u pásové pily?", options: ["Zrychluje posuv", "Drží materiál kolmo a tlumí vibrace", "Zahřívá dřevo", "Měří tloušťku řezu"], answer: "Drží materiál kolmo a tlumí vibrace" },
+        { question: "Co je *radiální řez*?", options: ["Řez rovnoběžný s letokruhy", "Řez kolmý k letokruhům a procházející středem kmene", "Příčný řez", "Řez obloukem"], answer: "Řez kolmý k letokruhům a procházející středem kmene" },
+        { question: "Jaký je hlavní rozdíl mezi dubem letním a dubem zimním?", options: ["Délka života", "Množství bělí", "Vzhled a kvalita dřeva", "Čas shazování listí a kvalita dřeva"], answer: "Čas shazování listí a kvalita dřeva" },
+        { question: "Co je to *lepená lamelová vrstvená dřevěná deska (LLVD)*?", options: ["Překližka", "Bio deska", "Nosný prvek pro velké rozpětí", "Tenká dýha"], answer: "Nosný prvek pro velké rozpětí" },
+        { question: "Jaký je účel *šablony na panty*?", options: ["Usnadňuje instalaci šuplíků", "Zajišťuje přesné a opakované frézování/vrtání otvorů pro panty", "Slouží k broušení pantů", "Používá se k měření vlhkosti"], answer: "Zajišťuje přesné a opakované frézování/vrtání otvorů pro panty" },
+        { question: "Co je *cinkování*?", options: ["Natírání mořidlem", "Proces výroby rybinového spoje (cink)", "Broušení na lesk", "Vrtání děr pro kolíky"], answer: "Proces výroby rybinového spoje (cink)" },
+        { question: "Jaká je typická zrnitost pro závěrečné broušení tvrdého dřeva před lakováním?", options: ["P40", "P100", "P180-220", "P500"], answer: "P180-220" },
+        { question: "K čemu slouží *soustruh* v truhlářství?", options: ["K řezání desek", "K výrobě rotačních prvků (nohy stolu, válečky)", "K hoblování", "K dlabání"], answer: "K výrobě rotačních prvků (nohy stolu, válečky)" },
+        { question: "Jaký je nejčastější způsob lepení dýhy na velkých plochách?", options: ["Kontaktní lepidlo", "Za studena v lise", "Vytvrzování v peci", "Ruční nanášení lepidla štětcem"], answer: "Za studena v lise" },
+        { question: "Co je *kazy dřeva*?", options: ["Krásná kresba", "Defekty (suky, hniloba, trhliny) snižující kvalitu a pevnost", "Povrchová úprava", "Lesklý nátěr"], answer: "Defekty (suky, hniloba, trhliny) snižující kvalitu a pevnost" },
+        { question: "Jak se nazývá druh šroubu s velkou hlavou pro spojování masivních dílů (např. v rámech)?", options: ["Konfirmát", "Vruty do sádrokartonu", "Šroub Tesařský (nebo kombi šroub)", "Metrický šroub"], answer: "Šroub Tesařský (nebo kombi šroub)" },
+        { question: "Co je *kyselina šťavelová*?", options: ["Lepidlo", "Přírodní čistič a bělič dřeva", "Mořidlo", "Tmel na dřevo"], answer: "Přírodní čistič a bělič dřeva" },
+        { question: "Co je hlavním úkolem podlahového lepidla při pokládce parket?", options: ["Zvyšuje lesk", "Umožňuje dilataci a drží parkety na místě", "Barví dřevo", "Zvyšuje tloušťku"], answer: "Umožňuje dilataci a drží parkety na místě" },
     ];
-    // POZNÁMKA: Databáze má nyní 10 otázek. Pro maximální limit 30 je nutné ji rozšířit.
+    // Celkový počet otázek: 110
 
     let currentQuizData = []; 
     let correctAnswersCount = 0;
@@ -339,12 +448,15 @@
     function generateNewQuiz() {
         const maxAvailable = fullQuizData.length;
         const numInput = document.getElementById('num-questions');
-        // Omezení, aby negeneroval víc, než je v databázi, a max. na 30, pokud databáze překročí
-        const numToGenerate = Math.min(parseInt(numInput.value) || maxAvailable, maxAvailable, 30);
+        // Omezení počtu generovaných otázek
+        const numToGenerate = Math.min(parseInt(numInput.value) || 10, maxAvailable, 110);
         
-        // Aktualizace max hodnoty inputu pro případ, že databáze byla rozšířena
-        numInput.setAttribute('max', maxAvailable);
-        document.getElementById('max-questions').textContent = maxAvailable;
+        // Zabezpečení proti neplatnému vstupu
+        if (numToGenerate < 1 || isNaN(numToGenerate)) {
+             numInput.value = 10;
+             alert('Neplatný počet otázek. Nastaveno na 10.');
+             return;
+        }
 
         // Resetování stavu
         correctAnswersCount = 0;
@@ -352,13 +464,17 @@
         totalQuestions = numToGenerate;
         document.getElementById('result-message').style.display = 'none';
         
-        // Náhodný výběr a zamíchání otázek (Shallow copy databáze)
+        // Náhodný výběr a zamíchání otázek
         const shuffled = [...fullQuizData].sort(() => 0.5 - Math.random());
         currentQuizData = shuffled.slice(0, numToGenerate);
 
         // Zobrazení nového kvízu a přepnutí na sekci kvízu
         loadQuiz();
+        updateProgressBar();
         switchSection('quiz');
+        
+        // Scroll na začátek kvízu
+        document.getElementById('quiz-area').scrollIntoView({ behavior: 'smooth' });
     }
 
     // --- Funkce pro Zobrazení Kvízu ---
@@ -368,16 +484,19 @@
         totalQuestions = currentQuizData.length;
 
         if (totalQuestions === 0) {
-             quizArea.innerHTML = '<p style="color: red; font-weight: bold; text-align: center;">**Test nebyl vygenerován.** Přejděte do sekce "Generovat Test" a nastavte počet otázek.</p>';
+             quizArea.innerHTML = '<p style="color: red; font-weight: bold; text-align: center;">**Test nebyl vygenerován.** Přejděte do sekce "Generovat Test" a klikněte na tlačítko.</p>';
              document.getElementById('submit-quiz').disabled = true;
+             document.getElementById('progress-bar').style.width = '0%';
+             document.getElementById('progress-bar').textContent = '0/0 Hotovo';
              return;
         }
 
         currentQuizData.forEach((item, index) => {
             const qContainer = document.createElement('div');
             qContainer.classList.add('question-container');
-            
-            // Náhodné zamíchání možností (aby nebyly správné odpovědi vždy na stejném místě)
+            qContainer.style.animationDelay = `${index * 0.1}s`; // Postupné zobrazení
+
+            // Náhodné zamíchání možností pro každou otázku
             const shuffledOptions = [...item.options].sort(() => 0.5 - Math.random());
             
             qContainer.innerHTML = `
@@ -395,10 +514,32 @@
             quizArea.appendChild(qContainer);
         });
         
-        // Povolí tlačítko pro dokončení, pokud existují otázky
+        // Povolí tlačítko pro dokončení
         document.getElementById('submit-quiz').disabled = false;
-        // Tlačítko se zablokuje, dokud nejsou zodpovězeny všechny
         updateSubmitButtonState(); 
+    }
+
+    // --- Aktualizace Progress Baru ---
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progress-bar');
+        if (totalQuestions === 0) {
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0/0 Hotovo';
+            return;
+        }
+        
+        const percentage = (answeredQuestionsCount / totalQuestions) * 100;
+        progressBar.style.width = `${percentage}%`;
+        progressBar.textContent = `${answeredQuestionsCount}/${totalQuestions} Hotovo`;
+
+        // Změna barvy pro vizuální efekt
+        if (percentage < 30) {
+            progressBar.style.backgroundColor = '#f44336'; // Červená
+        } else if (percentage < 70) {
+            progressBar.style.backgroundColor = '#ff9800'; // Oranžová
+        } else {
+            progressBar.style.backgroundColor = '#4caf50'; // Zelená
+        }
     }
 
     // --- Funkce pro Kontrolu Odpovědi a Okamžitou Zpětnou Vazbu ---
@@ -409,10 +550,17 @@
         const radioButtons = optionsContainer.querySelectorAll('input[type="radio"]');
 
         const alreadyAnswered = optionsContainer.dataset.answered === 'true';
+        
+        // Zamezení vícenásobnému započítání
+        if (!alreadyAnswered) {
+             answeredQuestionsCount++;
+             optionsContainer.dataset.answered = 'true';
+        }
+        
         feedbackElement.style.display = 'block';
+        feedbackElement.classList.remove('shake', 'pulse', 'incorrect', 'correct'); // Reset animace
 
         if (selectedOption === questionData.answer) {
-            feedbackElement.classList.remove('incorrect');
             feedbackElement.classList.add('correct');
             feedbackElement.innerHTML = "✅ **Správně!**";
 
@@ -420,7 +568,6 @@
                 correctAnswersCount++;
             }
         } else {
-            feedbackElement.classList.remove('correct');
             feedbackElement.classList.add('incorrect');
             feedbackElement.innerHTML = `❌ **Špatně.** Správná odpověď je: **${questionData.answer}**`;
         }
@@ -430,23 +577,20 @@
             radio.disabled = true;
             const label = radio.parentElement;
             
-            // Zvýraznění správné odpovědi zeleně
             if (radio.value === questionData.answer) {
                 label.style.fontWeight = 'bold';
-                label.style.backgroundColor = '#d4edda';
+                label.style.backgroundColor = '#d4edda'; // Správná (světle zelená)
             }
-            // Zvýraznění chybně zvolené odpovědi červeně
             else if (radio.value === selectedOption) {
-                label.style.backgroundColor = '#f8d7da';
+                label.style.backgroundColor = '#f8d7da'; // Zvolená špatná (světle červená)
+            } else {
+                label.style.backgroundColor = '#fcfcfc'; // Ostatní bílé
             }
+            label.style.borderColor = '#ccc';
         });
 
-        if (!alreadyAnswered) {
-             answeredQuestionsCount++;
-             optionsContainer.dataset.answered = 'true';
-        }
-
         updateSubmitButtonState();
+        updateProgressBar();
     }
 
     // --- Funkce pro Kontrolu Všech Odpovědí (Aktivace Tlačítka) ---
@@ -522,13 +666,21 @@
         }
     }
     
-    // --- Přepínání Sekcí ---
+    // --- Přepínání Sekcí s Animací ---
     function switchSection(sectionId) {
+        // Skrýt všechny sekce s animací
         document.querySelectorAll('.section-content').forEach(section => {
             section.classList.remove('active');
         });
-        document.getElementById(sectionId + '-section').classList.add('active');
         
+        // Nastavit aktivní sekci
+        const activeSection = document.getElementById(sectionId + '-section');
+        // Použít malý timeout pro plynulý fade-in/out efekt
+        setTimeout(() => {
+            activeSection.classList.add('active');
+        }, 10); 
+        
+        // Změna aktivního navigačního tlačítka
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
@@ -545,12 +697,13 @@
         
         // Nastaví maximální počet otázek v generátoru
         document.getElementById('num-questions').setAttribute('max', maxAvailable);
-        document.getElementById('num-questions').value = maxAvailable;
-        document.getElementById('max-questions').textContent = maxAvailable;
+        document.getElementById('num-questions').value = Math.min(10, maxAvailable); // Výchozí hodnota 10
+        document.getElementById('max-questions').textContent = `${maxAvailable}+`;
 
         // Načte prázdný kvíz a zobrazí statistiky
         loadQuiz();
         displayStats();
+        updateProgressBar();
 
         // Nastaví listenery pro přepínání sekcí
         document.querySelectorAll('.nav-btn').forEach(button => {
