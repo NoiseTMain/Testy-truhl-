@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kvíz pro Truhláře</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .question-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .options label {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .options label:hover {
+            background-color: #eee;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 4px;
+            display: none; /* Skryto, dokud není zvolena odpověď */
+        }
+        .correct {
+            background-color: #e6ffe6; /* Světle zelená */
+            color: #008000; /* Zelený text */
+            border: 1px solid #008000;
+        }
+        .incorrect {
+            background-color: #ffe6e6; /* Světle červená */
+            color: #ff0000; /* Červený text */
+            border: 1px solid #ff0000;
+        }
+        .statistics {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 2px solid #2c3e50;
+            background-color: #ecf0f1;
+            border-radius: 6px;
+        }
+        .statistics h2 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+        .result-message {
+            text-align: center;
+            font-size: 1.5em;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #2c3e50;
+            border-radius: 6px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Testy pro Truhláře 🌳</h1>
+    <p>Vyber odpověď u každé otázky. Zpětná vazba se zobrazí okamžitě.</p>
+
+    <div id="quiz-area">
+        </div>
+
+    <button id="submit-quiz" class="submit-btn" disabled>Dokončit Test a Zobrazit Výsledek</button>
+    <div id="result-message" class="result-message"></div>
+
+    <hr>
+
+    <div class="statistics">
+        <h2>📊 Statistika a Hodnocení</h2>
+        <p><strong>Počet vyplněných testů:</strong> <span id="total-tests">0</span></p>
+        <p><strong>Průměrná známka (1 = nejlepší):</strong> <span id="average-grade">Neznámá</span></p>
+        <p class="small-info">Hodnocení se počítá jako: 1.0 (100% správně) až 5.0 (0% správně).</p>
+        <button onclick="resetStats()" style="background-color: #e74c3c; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Resetovat Statistiky</button>
+    </div>
+
+</div>
+
+<script>
+    // --- Data pro Kvíz ---
+    const quizData = [
+        {
+            question: "Které dřevo se nejčastěji používá na výrobu masivního nábytku do interiérů?",
+            options: ["Smrk", "Dub", "Topol", "Lípa"],
+            answer: "Dub"
+        },
+        {
+            question: "Co je to *dýha*?",
+            options: ["Umělý materiál imitující dřevo", "Tenký list dřeva určený k oplášťování (forniru)", "Druh povrchové úpravy laku", "Nástroj pro ruční broušení"],
+            answer: "Tenký list dřeva určený k oplášťování (forniru)"
+        },
+        {
+            question: "Který nástroj se primárně používá pro přesné opracování rohu (čep a dlab)?",
+            options: ["Pila ocaska", "Hoblík klopkař", "Dláto", "Vrtací šablona"],
+            answer: "Dláto"
+        },
+        {
+            question: "Jak se nazývá povrchová úprava, která proniká do dřeva a zvýrazňuje jeho strukturu, ale nevytváří film?",
+            options: ["Lakování", "Moření", "Olejování/Voskování", "Lazurování"],
+            answer: "Olejování/Voskování"
+        }
+    ];
+
+    // --- Proměnné pro Logiku a Statistiku ---
+    let correctAnswersCount = 0;
+    let answeredQuestionsCount = 0;
+    const totalQuestions = quizData.length;
+
+    // Načtení statistik z Local Storage
+    let stats = loadStats();
+
+    // --- Funkce pro Zobrazení Kvízu ---
+    function loadQuiz() {
+        const quizArea = document.getElementById('quiz-area');
+        quizArea.innerHTML = '';
+
+        quizData.forEach((item, index) => {
+            const qContainer = document.createElement('div');
+            qContainer.classList.add('question-container');
+            qContainer.innerHTML = `
+                <h3>${index + 1}. ${item.question}</h3>
+                <div class="options" id="q${index}-options">
+                    ${item.options.map(option => `
+                        <label>
+                            <input type="radio" name="question${index}" value="${option}" onclick="checkAnswer(${index}, '${option}')">
+                            ${option}
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="feedback" id="q${index}-feedback"></div>
+            `;
+            quizArea.appendChild(qContainer);
+        });
+        updateSubmitButtonState();
+    }
+
+    // --- Funkce pro Kontrolu Odpovědi a Okamžitou Zpětnou Vazbu ---
+    function checkAnswer(questionIndex, selectedOption) {
+        const questionData = quizData[questionIndex];
+        const feedbackElement = document.getElementById(`q${questionIndex}-feedback`);
+        const optionsContainer = document.getElementById(`q${questionIndex}-options`);
+        const radioButtons = optionsContainer.querySelectorAll('input[type="radio"]');
+
+        // Zkontrolujeme, zda tato otázka již byla zodpovězena, abychom nezapočítali znovu
+        const alreadyAnswered = optionsContainer.dataset.answered === 'true';
+
+        // Zobrazení zpětné vazby
+        feedbackElement.style.display = 'block';
+
+        if (selectedOption === questionData.answer) {
+            feedbackElement.classList.remove('incorrect');
+            feedbackElement.classList.add('correct');
+            feedbackElement.innerHTML = "✅ **Správně!**";
+
+            if (!alreadyAnswered) {
+                correctAnswersCount++;
+            }
+        } else {
+            feedbackElement.classList.remove('correct');
+            feedbackElement.classList.add('incorrect');
+            feedbackElement.innerHTML = `❌ **Špatně.** Správná odpověď je: **${questionData.answer}**`;
+        }
+
+        // Zablokování možnosti změny odpovědi (pro okamžitou zpětnou vazbu)
+        radioButtons.forEach(radio => {
+            radio.disabled = true;
+            // Zvýraznění správné/špatné odpovědi
+            const label = radio.parentElement;
+            label.style.fontWeight = (radio.value === questionData.answer) ? 'bold' : 'normal';
+            if (radio.value === selectedOption) {
+                label.style.backgroundColor = (selectedOption === questionData.answer) ? '#d4edda' : '#f8d7da';
+            } else if (radio.value === questionData.answer) {
+                label.style.backgroundColor = '#d4edda'; // Správná odpověď se zvýrazní zeleně i když nebyla vybrána
+            } else {
+                 label.style.backgroundColor = 'white';
+            }
+        });
+
+        if (!alreadyAnswered) {
+             answeredQuestionsCount++;
+             optionsContainer.dataset.answered = 'true'; // Označení otázky jako zodpovězené
+        }
+
+        updateSubmitButtonState();
+    }
+
+    // --- Funkce pro Kontrolu Všech Odpovědí (Aktivace Tlačítka) ---
+    function updateSubmitButtonState() {
+        const submitButton = document.getElementById('submit-quiz');
+        if (answeredQuestionsCount === totalQuestions) {
+            submitButton.disabled = false;
+        } else {
+            submitButton.disabled = true;
+        }
+    }
+
+    // --- Funkce pro Dokončení Testu a Uložení Statistik ---
+    document.getElementById('submit-quiz').addEventListener('click', () => {
+        if (answeredQuestionsCount === totalQuestions) {
+            // Výpočet výsledků
+            const percentage = (correctAnswersCount / totalQuestions) * 100;
+            const grade = calculateGrade(percentage);
+
+            // Zobrazení výsledku
+            const resultMessage = document.getElementById('result-message');
+            resultMessage.style.display = 'block';
+            resultMessage.innerHTML = `
+                Gratuluji, test dokončen! 🎉<br>
+                Získal jsi **${correctAnswersCount}** správných odpovědí z **${totalQuestions}** (${percentage.toFixed(0)}%).<br>
+                Tvoje známka za tento test je: **${grade}**
+            `;
+
+            // Uložení a aktualizace statistik
+            updateStats(grade);
+
+            // Zablokování tlačítka po dokončení testu
+            document.getElementById('submit-quiz').disabled = true;
+        }
+    });
+
+    // --- Funkce pro Výpočet Známky (České Školní Hodnocení 1-5) ---
+    function calculateGrade(percentage) {
+        if (percentage >= 90) return 1.0;
+        if (percentage >= 75) return 2.0;
+        if (percentage >= 50) return 3.0;
+        if (percentage >= 30) return 4.0;
+        return 5.0;
+    }
+
+    // --- Funkce pro Statistiku ---
+
+    function loadStats() {
+        const storedStats = localStorage.getItem('carpenterQuizStats');
+        return storedStats ? JSON.parse(storedStats) : {
+            totalTests: 0,
+            totalGradeSum: 0,
+            averageGrade: null
+        };
+    }
+
+    function saveStats() {
+        localStorage.setItem('carpenterQuizStats', JSON.stringify(stats));
+    }
+
+    function updateStats(newGrade) {
+        // Nový test se započítá, pouze pokud má platnou známku
+        if (newGrade >= 1.0 && newGrade <= 5.0) {
+            stats.totalTests++;
+            stats.totalGradeSum += newGrade;
+            stats.averageGrade = stats.totalGradeSum / stats.totalTests;
+            saveStats();
+        }
+        displayStats();
+    }
+
+    function displayStats() {
+        document.getElementById('total-tests').textContent = stats.totalTests;
+        document.getElementById('average-grade').textContent = stats.averageGrade
+            ? stats.averageGrade.toFixed(2) : 'Neznámá';
+    }
+
+    function resetStats() {
+        if (confirm("Opravdu chcete resetovat veškeré uložené statistiky?")) {
+            localStorage.removeItem('carpenterQuizStats');
+            stats = loadStats();
+            displayStats();
+            alert("Statistiky byly resetovány.");
+        }
+    }
+
+    // Spuštění aplikace po načtení stránky
+    window.onload = () => {
+        loadQuiz();
+        displayStats();
+    };
+
+</script>
+</body>
+</html>
