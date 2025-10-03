@@ -3,158 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kvíz pro Truhláře - S profilem a generováním</title>
+    <title>Kvíz pro Truhláře - Generátor Testů</title>
     <style>
+        /* Základní reset a písmo */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8eaf6; /* Světle modré pozadí */
             color: #333;
             margin: 0;
             padding: 20px;
         }
+
+        /* Hlavní kontejner */
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: #fff;
+            background: #ffffff;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Jemnější stín */
         }
+        
+        /* Titulek */
         h1 {
-            color: #2c3e50;
+            color: #1a237e; /* Tmavě modrá */
             text-align: center;
+            margin-bottom: 25px;
         }
-        /* Navigační tlačítka pro přepínání sekcí */
+
+        /* Navigační tlačítka */
         .nav-buttons {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ccc;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #c5cae9;
         }
         .nav-btn {
-            padding: 10px 20px;
+            flex-grow: 1;
+            padding: 12px 15px;
             cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #ecf0f1;
-            transition: background-color 0.3s;
+            border: none;
+            border-radius: 6px;
+            background-color: #bbdefb; /* Světlejší modrá */
+            color: #1a237e;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s;
         }
-        .nav-btn.active, .nav-btn:hover {
-            background-color: #3498db;
+        .nav-btn.active {
+            background-color: #3f51b5; /* Střední modrá - aktivní */
             color: white;
-            border-color: #3498db;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
         }
-        /* Styly pro sekce */
+        .nav-btn:not(.active):hover {
+            background-color: #90caf9;
+            transform: translateY(-2px);
+        }
+
+        /* Sekce */
         .section-content {
-            display: none; /* Skrýt všechny sekce na začátku */
+            display: none;
             padding: 15px 0;
         }
         .section-content.active {
             display: block;
         }
+        
+        /* Kontejner Otázky */
         .question-container {
             margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fcfcfc;
         }
+        .question-container h3 {
+            color: #3f51b5;
+            margin-top: 0;
+        }
+
+        /* Možnosti odpovědí */
         .options label {
             display: block;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            margin: 8px 0;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s, border-color 0.2s;
         }
         .options label:hover {
-            background-color: #eee;
+            border-color: #90caf9;
+            background-color: #f5f5f5;
         }
-        input[type="radio"] {
-            margin-right: 10px;
-        }
+        
+        /* Zpětná vazba */
         .feedback {
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: bold;
-            padding: 8px;
-            border-radius: 4px;
+            padding: 10px;
+            border-radius: 6px;
             display: none;
         }
         .correct {
-            background-color: #e6ffe6;
-            color: #008000;
-            border: 1px solid #008000;
+            background-color: #e8f5e9; /* Světle zelená */
+            color: #388e3c; /* Tmavě zelený text */
+            border: 2px solid #388e3c;
         }
         .incorrect {
-            background-color: #ffe6e6;
-            color: #ff0000;
-            border: 1px solid #ff0000;
+            background-color: #ffebee; /* Světle červená */
+            color: #d32f2f; /* Tmavě červený text */
+            border: 2px solid #d32f2f;
         }
+        
+        /* Statistiky */
         .statistics-content {
-            margin-top: 10px;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border-radius: 6px;
+            padding: 20px;
+            background-color: #e3f2fd; /* Velmi světle modrá */
+            border-radius: 8px;
+            border: 1px solid #bbdefb;
         }
+        .statistics-content h3 {
+            color: #1a237e;
+        }
+        
+        /* Tlačítko pro dokončení */
         .submit-btn {
             display: block;
             width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            background-color: #3498db;
+            padding: 18px;
+            margin-top: 25px;
+            background-color: #ff9800; /* Oranžová */
             color: white;
             border: none;
-            border-radius: 5px;
-            font-size: 1.2em;
+            border-radius: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
-        .submit-btn:hover {
-            background-color: #2980b9;
+        .submit-btn:hover:not(:disabled) {
+            background-color: #f57c00;
         }
+        .submit-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        /* Výsledek */
         .result-message {
             text-align: center;
-            font-size: 1.5em;
-            margin-top: 20px;
-            padding: 15px;
-            border: 2px solid #2c3e50;
-            border-radius: 6px;
-            display: none;
-        }
-        /* Sekce Generování */
-        .generation-controls {
+            font-size: 1.6em;
+            margin-top: 25px;
             padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background-color: #f9f9f9;
+            border: 3px solid #3f51b5;
+            border-radius: 10px;
+            background-color: #e8eaf6;
+            display: none;
+            color: #1a237e;
+            font-weight: bold;
+        }
+
+        /* Generátor */
+        .generation-controls {
+            padding: 25px;
+            border: 2px dashed #90caf9;
+            border-radius: 10px;
+            background-color: #fffde7; /* Světle žluté pro upozornění */
             text-align: center;
         }
         .generation-controls label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            color: #3f51b5;
         }
         .generation-controls input[type="number"] {
-            padding: 8px;
-            width: 80px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
+            padding: 10px;
+            width: 70px;
+            border: 2px solid #3f51b5;
+            border-radius: 5px;
+            margin-right: 15px;
+            font-size: 1em;
         }
         .generate-btn {
-            padding: 10px 20px;
-            background-color: #2ecc71;
+            padding: 12px 25px;
+            background-color: #4caf50; /* Zelená */
             color: white;
             border: none;
             border-radius: 5px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
         }
         .generate-btn:hover {
-            background-color: #27ae60;
+            background-color: #388e3c;
         }
+        
+        /* Tlačítko reset */
+        .reset-btn {
+            background-color: #f44336 !important;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        .reset-btn:hover {
+            background-color: #d32f2f !important;
+        }
+
     </style>
 </head>
 <body>
@@ -163,15 +223,30 @@
     <h1>Testy z Odborných Předmětů - Truhlář 🌳</h1>
 
     <div class="nav-buttons">
-        <button class="nav-btn active" data-section="quiz">Spustit Test</button>
+        <button class="nav-btn active" data-section="generate">Generovat Test</button>
+        <button class="nav-btn" data-section="quiz">Spustit Test</button>
         <button class="nav-btn" data-section="profile">Můj Profil a Statistiky</button>
-        <button class="nav-btn" data-section="generate">Generovat Test</button>
     </div>
 
-    <div id="quiz-section" class="section-content active">
-        <p>Vyber odpověď u každé otázky. Zpětná vazba se zobrazí okamžitě.</p>
+    <div id="generate-section" class="section-content active">
+        <h2>⚙️ Generovat Nový Test</h2>
+        <div class="generation-controls">
+            <p style="font-weight: bold; color: #f44336;">⚠️ Důležité: Kód nemůže generovat otázky přímo z Google Search.</p>
+            <p>Generování probíhá náhodným výběrem z interní databáze truhlářských otázek, aby byl každý test jedinečný.</p>
+            <p>Vyber, kolik otázek chceš do testu. Max: <span id="max-questions" style="color: #3f51b5; font-size: 1.2em;">8</span> (Podle databáze).</p>
+            <label for="num-questions">
+                Počet otázek:
+                <input type="number" id="num-questions" min="1" max="8" value="8">
+            </label>
+            <button class="generate-btn" onclick="generateNewQuiz()">Generovat Test</button>
+        </div>
+        <p style="margin-top: 20px; text-align: center; color: #3f51b5;">Po vygenerování se automaticky přepni na sekci **Spustit Test**.</p>
+    </div>
+
+    <div id="quiz-section" class="section-content">
+        <p>Vyber odpověď u každé otázky. Zpětná vazba se zobrazí **okamžitě**.</p>
         <div id="quiz-area">
-            <p>**Test nebyl vygenerován.** Přejděte do sekce "Generovat Test".</p>
+            <p style="color: red;">**Test nebyl vygenerován.** Přejdi do sekce "Generovat Test" a klikni na tlačítko.</p>
         </div>
 
         <button id="submit-quiz" class="submit-btn" disabled>Dokončit Test a Zobrazit Výsledek</button>
@@ -179,34 +254,25 @@
     </div>
 
     <div id="profile-section" class="section-content">
-        <h2>👤 Můj Profil a Statistika</h2>
+        <h2>👤 Můj Profil a Statistiky</h2>
         <div class="statistics-content">
-            <p>Jméno studenta: **Truhlářský Mistr** (uloženo pouze dočasně)</p>
+            <p>Jméno studenta: **Truhlářský Mistr**</p>
             <p>Obor: **Truhlář / Dřevař**</p>
             <hr>
             <h3>Souhrn výsledků</h3>
             <p><strong>Celkový počet absolvovaných testů:</strong> <span id="total-tests">0</span></p>
-            <p><strong>Průměrná známka (1 = nejlepší):</strong> <span id="average-grade">Neznámá</span></p>
+            <p style="font-size: 1.2em; font-weight: bold;">
+                Průměrná známka (1 = nejlepší): <span id="average-grade">Neznámá</span>
+            </p>
             <p class="small-info">Hodnocení se počítá jako: 1.0 (100% správně) až 5.0 (0% správně).</p>
-            <button onclick="resetStats()" style="background-color: #e74c3c; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-top: 10px;">Resetovat Statistiky</button>
+            <button onclick="resetStats()" class="reset-btn">Resetovat Všechny Statistiky</button>
         </div>
-    </div>
-
-    <div id="generate-section" class="section-content">
-        <h2>⚙️ Generovat Nový Test</h2>
-        <div class="generation-controls">
-            <p>Vyber, kolik otázek chceš do testu. Max: <span id="max-questions">4</span> (Podle databáze).</p>
-            <label for="num-questions">Počet otázek:</label>
-            <input type="number" id="num-questions" min="1" max="4" value="4">
-            <button class="generate-btn" onclick="generateNewQuiz()">Generovat Test</button>
-        </div>
-        <p style="margin-top: 15px; text-align: center; color: #3498db;">Po vygenerování přejdi do sekce "Spustit Test".</p>
     </div>
 
 </div>
 
 <script>
-    // --- Data pro Kvíz (Rozšířená databáze pro lepší generování) ---
+    // --- DATABÁZE OTÁZEK PRO TRUHLÁŘE (Můžeš zde přidat až 30 a více otázek) ---
     const fullQuizData = [
         {
             question: "Které dřevo se nejčastěji používá na výrobu masivního nábytku do interiérů?",
@@ -247,10 +313,21 @@
             question: "Která povrchová úprava vytváří nejtvrdší a nejodolnější film?",
             options: ["Šelaková politura", "Akrylátový lak", "Voskování", "Olejování"],
             answer: "Akrylátový lak"
+        },
+        {
+            question: "Co je to *tangenciální řez*?",
+            options: ["Řez kolmý na letokruhy", "Řez rovnoběžný s letokruhy (boční stěny kmene)", "Řez středem kmene", "Řez šikmý na osu kmene"],
+            answer: "Řez rovnoběžný s letokruhy (boční stěny kmene)"
+        },
+        {
+            question: "Který spojovací prostředek se používá pro demontovatelný nábytek (montáž a demontáž)?",
+            options: ["Kolíky lepené", "Šroub Tesařský", "Konfirmáty", "Ploché spojovací kování (IKEA styl)"],
+            answer: "Ploché spojovací kování (IKEA styl)"
         }
     ];
+    // POZNÁMKA: Databáze má nyní 10 otázek. Pro maximální limit 30 je nutné ji rozšířit.
 
-    let currentQuizData = []; // Data pro aktuální test
+    let currentQuizData = []; 
     let correctAnswersCount = 0;
     let answeredQuestionsCount = 0;
     let totalQuestions = 0;
@@ -260,34 +337,38 @@
 
     // --- Funkce pro Generování Nového Kvízu ---
     function generateNewQuiz() {
+        const maxAvailable = fullQuizData.length;
         const numInput = document.getElementById('num-questions');
-        const numToGenerate = Math.min(parseInt(numInput.value) || fullQuizData.length, fullQuizData.length);
+        // Omezení, aby negeneroval víc, než je v databázi, a max. na 30, pokud databáze překročí
+        const numToGenerate = Math.min(parseInt(numInput.value) || maxAvailable, maxAvailable, 30);
+        
+        // Aktualizace max hodnoty inputu pro případ, že databáze byla rozšířena
+        numInput.setAttribute('max', maxAvailable);
+        document.getElementById('max-questions').textContent = maxAvailable;
 
         // Resetování stavu
         correctAnswersCount = 0;
         answeredQuestionsCount = 0;
         totalQuestions = numToGenerate;
         document.getElementById('result-message').style.display = 'none';
-        document.getElementById('submit-quiz').disabled = true;
-
-        // Náhodný výběr otázek
+        
+        // Náhodný výběr a zamíchání otázek (Shallow copy databáze)
         const shuffled = [...fullQuizData].sort(() => 0.5 - Math.random());
         currentQuizData = shuffled.slice(0, numToGenerate);
 
         // Zobrazení nového kvízu a přepnutí na sekci kvízu
         loadQuiz();
         switchSection('quiz');
-        alert(`Vygenerován nový test s ${numToGenerate} otázkami. Přesuň se do sekce "Spustit Test".`);
     }
 
-    // --- Funkce pro Zobrazení Kvízu (používá currentQuizData) ---
+    // --- Funkce pro Zobrazení Kvízu ---
     function loadQuiz() {
         const quizArea = document.getElementById('quiz-area');
         quizArea.innerHTML = '';
         totalQuestions = currentQuizData.length;
 
         if (totalQuestions === 0) {
-             quizArea.innerHTML = '<p style="color: red;">**Test nebyl vygenerován.** Přejděte do sekce "Generovat Test".</p>';
+             quizArea.innerHTML = '<p style="color: red; font-weight: bold; text-align: center;">**Test nebyl vygenerován.** Přejděte do sekce "Generovat Test" a nastavte počet otázek.</p>';
              document.getElementById('submit-quiz').disabled = true;
              return;
         }
@@ -295,10 +376,14 @@
         currentQuizData.forEach((item, index) => {
             const qContainer = document.createElement('div');
             qContainer.classList.add('question-container');
+            
+            // Náhodné zamíchání možností (aby nebyly správné odpovědi vždy na stejném místě)
+            const shuffledOptions = [...item.options].sort(() => 0.5 - Math.random());
+            
             qContainer.innerHTML = `
                 <h3>${index + 1}. ${item.question}</h3>
                 <div class="options" id="q${index}-options">
-                    ${item.options.map(option => `
+                    ${shuffledOptions.map(option => `
                         <label>
                             <input type="radio" name="question${index}" value="${option}" onclick="checkAnswer(${index}, '${option}')">
                             ${option}
@@ -309,7 +394,11 @@
             `;
             quizArea.appendChild(qContainer);
         });
-        updateSubmitButtonState();
+        
+        // Povolí tlačítko pro dokončení, pokud existují otázky
+        document.getElementById('submit-quiz').disabled = false;
+        // Tlačítko se zablokuje, dokud nejsou zodpovězeny všechny
+        updateSubmitButtonState(); 
     }
 
     // --- Funkce pro Kontrolu Odpovědi a Okamžitou Zpětnou Vazbu ---
@@ -336,16 +425,19 @@
             feedbackElement.innerHTML = `❌ **Špatně.** Správná odpověď je: **${questionData.answer}**`;
         }
 
+        // Zablokování a zvýraznění
         radioButtons.forEach(radio => {
             radio.disabled = true;
             const label = radio.parentElement;
-            label.style.fontWeight = (radio.value === questionData.answer) ? 'bold' : 'normal';
-            if (radio.value === selectedOption) {
-                label.style.backgroundColor = (selectedOption === questionData.answer) ? '#d4edda' : '#f8d7da';
-            } else if (radio.value === questionData.answer) {
+            
+            // Zvýraznění správné odpovědi zeleně
+            if (radio.value === questionData.answer) {
+                label.style.fontWeight = 'bold';
                 label.style.backgroundColor = '#d4edda';
-            } else {
-                 label.style.backgroundColor = 'white';
+            }
+            // Zvýraznění chybně zvolené odpovědi červeně
+            else if (radio.value === selectedOption) {
+                label.style.backgroundColor = '#f8d7da';
             }
         });
 
@@ -367,7 +459,7 @@
         }
     }
 
-    // --- Funkce pro Dokončení Testu a Uložení Statistik ---
+    // --- Dokončení Testu ---
     document.getElementById('submit-quiz').addEventListener('click', () => {
         if (answeredQuestionsCount === totalQuestions) {
             const percentage = (correctAnswersCount / totalQuestions) * 100;
@@ -386,7 +478,7 @@
         }
     });
 
-    // --- Funkce pro Výpočet Známky (České Školní Hodnocení 1-5) ---
+    // --- Výpočet Známky (1-5) ---
     function calculateGrade(percentage) {
         if (percentage >= 90) return 1.0;
         if (percentage >= 75) return 2.0;
@@ -395,14 +487,10 @@
         return 5.0;
     }
 
-    // --- Funkce pro Statistiku a Local Storage ---
+    // --- Statistiky a Local Storage ---
     function loadStats() {
         const storedStats = localStorage.getItem('carpenterQuizStats');
-        return storedStats ? JSON.parse(storedStats) : {
-            totalTests: 0,
-            totalGradeSum: 0,
-            averageGrade: null
-        };
+        return storedStats ? JSON.parse(storedStats) : { totalTests: 0, totalGradeSum: 0, averageGrade: null };
     }
 
     function saveStats() {
@@ -434,7 +522,7 @@
         }
     }
     
-    // --- Funkce pro Přepínání Sekcí ---
+    // --- Přepínání Sekcí ---
     function switchSection(sectionId) {
         document.querySelectorAll('.section-content').forEach(section => {
             section.classList.remove('active');
@@ -446,19 +534,19 @@
         });
         document.querySelector(`.nav-btn[data-section="${sectionId}"]`).classList.add('active');
 
-        // Speciální akce po přepnutí
         if (sectionId === 'profile') {
-            displayStats(); // Zajistí, že statistika je aktuální
+            displayStats();
         }
     }
 
     // --- Inicializace ---
     window.onload = () => {
+        const maxAvailable = fullQuizData.length;
+        
         // Nastaví maximální počet otázek v generátoru
-        const maxQ = fullQuizData.length;
-        document.getElementById('num-questions').setAttribute('max', maxQ);
-        document.getElementById('num-questions').value = maxQ;
-        document.getElementById('max-questions').textContent = maxQ;
+        document.getElementById('num-questions').setAttribute('max', maxAvailable);
+        document.getElementById('num-questions').value = maxAvailable;
+        document.getElementById('max-questions').textContent = maxAvailable;
 
         // Načte prázdný kvíz a zobrazí statistiky
         loadQuiz();
@@ -471,7 +559,7 @@
             });
         });
         
-        // Spustí aplikaci na sekci generování (aby si uživatel nejdřív vybral test)
+        // Spustí aplikaci na sekci generování
         switchSection('generate');
     };
 
